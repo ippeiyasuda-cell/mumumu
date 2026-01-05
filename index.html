@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>今日のあなたへ</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Segoe UI', 'Yu Gothic', sans-serif;
+            padding: 20px;
+        }
+        .container {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 50px 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+        }
+        h1 {
+            color: #764ba2;
+            margin-bottom: 30px;
+            font-size: 1.8em;
+        }
+        .message {
+            font-size: 1.5em;
+            color: #333;
+            line-height: 1.8;
+            min-height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.2em;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 20px;
+        }
+        button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+        .sparkle {
+            font-size: 2em;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sparkle">✨</div>
+        <h1>今日のあなたへ</h1>
+        <div class="message" id="message">ボタンを押してね！</div>
+        <button onclick="showMessage()">メッセージをもらう</button>
+    </div>
+
+    <script>
+        const messages = [
+            "あなたは今日もがんばってる！\nそれだけで100点満点！",
+            "失敗しても大丈夫。\nそれは成長の証だよ。",
+            "今日できなくても明日がある。\n焦らなくていいよ。",
+            "あなたの存在が\n誰かの力になってるよ。",
+            "完璧じゃなくていい。\nあなたらしくいればOK！",
+            "休むことも立派な仕事。\n自分を大切にしてね。",
+            "小さな一歩も\n積み重ねれば大きな道になる。",
+            "今日も生きてるだけで偉い！\nお疲れさま！",
+            "迷ったときは\n心がワクワクする方へ。",
+            "大丈夫、なんとかなる！\nあなたなら絶対できる！",
+            "昨日より今日、\n少しでも前に進んでるよ。",
+            "辛いときは泣いていい。\nそのあとまた笑おう。",
+            "あなたの努力は\nちゃんと見てる人がいるよ。",
+            "今日も最高の一日に\nなりますように！",
+            "自分を褒めてあげて。\nあなたは十分すごい！"
+        ];
+
+        function showMessage() {
+            const randomIndex = Math.floor(Math.random() * messages.length);
+            const messageEl = document.getElementById('message');
+            messageEl.style.opacity = '0';
+
+            setTimeout(() => {
+                messageEl.innerHTML = messages[randomIndex].replace(/\n/g, '<br>');
+                messageEl.style.opacity = '1';
+            }, 200);
+        }
+
+        // ページ読み込み時にもランダムメッセージを表示
+        window.onload = function() {
+            showMessage();
+        };
+    </script>
+</body>
+</html>
