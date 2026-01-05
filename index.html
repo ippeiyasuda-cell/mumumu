@@ -3,7 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>哲学者ガチャ</title>
+    <meta property="og:title" content="哲学者ガチャ - 炎上名言コレクション">
+    <meta property="og:description" content="古代の哲学者たちの過激発言をガチャで集めよう。SSRは現代なら確実に炎上する名言。">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary">
+    <title>哲学者ガチャ - 炎上名言コレクション</title>
     <style>
         *,
         *::before,
@@ -27,6 +31,11 @@
             color: #333;
             line-height: 1.8;
             padding: 1.5rem;
+            transition: background-color 0.5s ease;
+        }
+
+        body.is-ssr {
+            background-color: #ffebee;
         }
 
         .card {
@@ -34,14 +43,14 @@
             max-width: 32rem;
             background-color: #fff;
             border: 1px solid #e0e0e0;
-            padding: 3rem 2rem;
+            padding: 2rem 1.5rem;
         }
 
         .card-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
         }
 
         .card-title {
@@ -52,7 +61,7 @@
         }
 
         .rarity {
-            font-size: 0.875rem;
+            font-size: 1rem;
             font-weight: bold;
             letter-spacing: 0.05em;
             opacity: 0;
@@ -66,14 +75,34 @@
         .rarity-n { color: #757575; }
         .rarity-r { color: #2196F3; }
         .rarity-sr { color: #9C27B0; }
-        .rarity-ssr { color: #F44336; }
+        .rarity-ssr { color: #F44336; font-size: 1.25rem; }
+
+        .pity-bar {
+            height: 4px;
+            background-color: #e0e0e0;
+            margin-bottom: 1.5rem;
+        }
+
+        .pity-bar-fill {
+            height: 100%;
+            background-color: #F44336;
+            transition: width 0.3s ease;
+        }
+
+        .pity-text {
+            font-size: 0.75rem;
+            color: #757575;
+            text-align: right;
+            margin-top: 0.25rem;
+            margin-bottom: 1rem;
+        }
 
         .quote {
             font-size: 1.125rem;
-            min-height: 10rem;
+            min-height: 8rem;
             display: flex;
             align-items: center;
-            margin-bottom: 2.5rem;
+            margin-bottom: 2rem;
             transition: opacity 0.2s ease;
         }
 
@@ -109,9 +138,37 @@
             color: #757575;
         }
 
+        .multi-results {
+            font-size: 0.875rem;
+            max-height: 12rem;
+            overflow-y: auto;
+            margin-bottom: 1.5rem;
+            border: 1px solid #e0e0e0;
+            padding: 1rem;
+        }
+
+        .multi-result-item {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .multi-result-item:last-child {
+            border-bottom: none;
+        }
+
+        .multi-result-rarity {
+            font-weight: bold;
+            margin-right: 0.5rem;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
         .button {
-            display: block;
-            width: 100%;
+            flex: 1;
             padding: 1rem;
             font-size: 1rem;
             font-family: inherit;
@@ -122,13 +179,16 @@
             transition: background-color 0.2s ease;
         }
 
+        .button-ten {
+            background-color: #F44336;
+        }
+
         .button:hover {
             background-color: #555;
         }
 
-        .button:focus {
-            outline: 2px solid #333;
-            outline-offset: 2px;
+        .button-ten:hover {
+            background-color: #d32f2f;
         }
 
         .button:disabled {
@@ -136,20 +196,100 @@
             cursor: not-allowed;
         }
 
+        .button-share {
+            display: block;
+            width: 100%;
+            padding: 0.75rem;
+            font-size: 0.875rem;
+            font-family: inherit;
+            color: #333;
+            background-color: #fff;
+            border: 1px solid #333;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            margin-bottom: 1rem;
+        }
+
+        .button-share:hover {
+            background-color: #f5f5f5;
+        }
+
         .stats {
-            margin-top: 1.5rem;
             font-size: 0.75rem;
             color: #757575;
             text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .collection-toggle {
+            font-size: 0.75rem;
+            color: #2196F3;
+            text-align: center;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        .collection {
+            display: none;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .collection.is-open {
+            display: block;
+        }
+
+        .collection-title {
+            font-size: 0.875rem;
+            font-weight: normal;
+            color: #757575;
+            margin-bottom: 1rem;
+        }
+
+        .collection-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 0.5rem;
+        }
+
+        .collection-item {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.625rem;
+            background-color: #e0e0e0;
+            color: #757575;
+        }
+
+        .collection-item.is-collected {
+            background-color: #333;
+            color: #fff;
+        }
+
+        .collection-item.is-ssr {
+            background-color: #F44336;
+        }
+
+        .progress-text {
+            font-size: 0.75rem;
+            color: #757575;
+            text-align: center;
+            margin-top: 1rem;
         }
 
         @media (max-width: 480px) {
             .card {
-                padding: 2rem 1.5rem;
+                padding: 1.5rem 1rem;
             }
 
             .quote {
                 font-size: 1rem;
+            }
+
+            .buttons {
+                flex-direction: column;
             }
         }
     </style>
@@ -160,145 +300,321 @@
             <h1 class="card-title">哲学者ガチャ</h1>
             <span class="rarity" id="rarity"></span>
         </div>
+
+        <div class="pity-bar">
+            <div class="pity-bar-fill" id="pity-bar-fill" style="width: 0%"></div>
+        </div>
+        <p class="pity-text" id="pity-text">天井まで: 50回</p>
+
         <blockquote class="quote" id="quote">
             <span class="quote-text" id="quote-text"></span>
         </blockquote>
-        <button type="button" class="button" id="gacha-button">ガチャを回す</button>
+
+        <div class="multi-results" id="multi-results" style="display: none;"></div>
+
+        <div class="buttons">
+            <button type="button" class="button" id="gacha-button">1回引く</button>
+            <button type="button" class="button button-ten" id="gacha-ten-button">10連</button>
+        </div>
+
+        <button type="button" class="button-share" id="share-button">Xでシェアする</button>
+
         <p class="stats" id="stats"></p>
+
+        <p class="collection-toggle" id="collection-toggle">図鑑を見る</p>
+
+        <div class="collection" id="collection">
+            <h2 class="collection-title">コレクション</h2>
+            <div class="collection-grid" id="collection-grid"></div>
+            <p class="progress-text" id="progress-text"></p>
+        </div>
     </main>
 
     <script>
         const quotes = [
-            // === 通常名言 (N/R) ===
-            { text: "働くことは生きること。生きることは働くことだ。", author: "カール・マルクス", rarity: "N" },
-            { text: "天才とは1%のひらめきと99%の努力である。", author: "トーマス・エジソン", rarity: "N" },
-            { text: "最も重要なことは、自分の仕事を愛することだ。", author: "孔子", rarity: "N" },
-            { text: "汝の立つところを深く掘れ。そこには泉がある。", author: "フリードリヒ・ニーチェ", rarity: "R" },
-            { text: "小さなことを重ねることが、とんでもないところに行くただ一つの道だ。", author: "アリストテレス", rarity: "N" },
-            { text: "人生において最も輝かしい時は、失敗や絶望から立ち上がる時だ。", author: "ソクラテス", rarity: "N" },
-            { text: "始めることが難しい。だが、始めなければ何も生まれない。", author: "プラトン", rarity: "N" },
-            { text: "我思う、ゆえに我あり。思考こそが仕事の本質だ。", author: "ルネ・デカルト", rarity: "R" },
-            { text: "怠惰は心の錆である。", author: "セネカ", rarity: "N" },
-            { text: "今日なし得ることを明日に延ばすな。", author: "ベンジャミン・フランクリン", rarity: "N" },
-            { text: "人間は考える葦である。考えることが我々の仕事だ。", author: "ブレーズ・パスカル", rarity: "R" },
-            { text: "困難な道と楽な道があるなら、困難な道を選べ。", author: "エピクテトス", rarity: "R" },
-            { text: "仕事とは、自己実現への道である。", author: "ゲオルク・ヘーゲル", rarity: "R" },
-            { text: "急いで結果を求めるな。偉大なことは時間がかかる。", author: "アリストテレス", rarity: "N" },
-            { text: "知は力なり。学び続けることが最高の仕事だ。", author: "フランシス・ベーコン", rarity: "R" },
-            { text: "他人の意見に振り回されるな。自分の仕事に集中せよ。", author: "マルクス・アウレリウス", rarity: "R" },
-            { text: "失敗を恐れるな。失敗は成功の母である。", author: "ジョン・デューイ", rarity: "N" },
-            { text: "人は習慣によって作られる。優れた結果は習慣から生まれる。", author: "アリストテレス", rarity: "N" },
-            { text: "簡素に生きよ。そして高く考えよ。", author: "ソクラテス", rarity: "N" },
-            { text: "人生は短い。だからこそ、自分の仕事に情熱を注げ。", author: "セネカ", rarity: "N" },
-            { text: "万物は流転する。変化を恐れず、前に進め。", author: "ヘラクレイトス", rarity: "R" },
-            { text: "無知の知。自分の限界を知ることが成長の始まりだ。", author: "ソクラテス", rarity: "N" },
-            { text: "意志あるところに道は開ける。", author: "アルトゥル・ショーペンハウアー", rarity: "R" },
-            { text: "最大多数の最大幸福のために働け。", author: "ジェレミー・ベンサム", rarity: "R" },
-            { text: "自由とは責任を意味する。だから多くの人が自由を恐れる。", author: "ジャン＝ポール・サルトル", rarity: "R" },
-            { text: "実存は本質に先立つ。自分の仕事で自分を創れ。", author: "ジャン＝ポール・サルトル", rarity: "SR" },
-            { text: "中庸こそ最善。極端を避け、バランスを保て。", author: "アリストテレス", rarity: "N" },
-            { text: "人間は自由の刑に処されている。", author: "ジャン＝ポール・サルトル", rarity: "R" },
-            { text: "幸福は活動の中にある。何もしない者に幸福はない。", author: "アリストテレス", rarity: "N" },
-            { text: "今日が人生最後の日だと思って働け。", author: "マルクス・アウレリウス", rarity: "R" },
+            // === N: 有名な名言 ===
+            { id: 1, text: "働くことは生きること。", author: "カール・マルクス", rarity: "N" },
+            { id: 2, text: "天才とは1%のひらめきと99%の努力である。", author: "トーマス・エジソン", rarity: "N" },
+            { id: 3, text: "最も重要なことは、自分の仕事を愛することだ。", author: "孔子", rarity: "N" },
+            { id: 4, text: "怠惰は心の錆である。", author: "セネカ", rarity: "N" },
+            { id: 5, text: "今日なし得ることを明日に延ばすな。", author: "ベンジャミン・フランクリン", rarity: "N" },
+            { id: 6, text: "失敗を恐れるな。失敗は成功の母である。", author: "ジョン・デューイ", rarity: "N" },
+            { id: 7, text: "簡素に生きよ。そして高く考えよ。", author: "ソクラテス", rarity: "N" },
+            { id: 8, text: "無知の知。自分の限界を知ることが成長の始まりだ。", author: "ソクラテス", rarity: "N" },
+            { id: 9, text: "中庸こそ最善。", author: "アリストテレス", rarity: "N" },
+            { id: 10, text: "幸福は活動の中にある。", author: "アリストテレス", rarity: "N" },
+
+            // === R: やや渋い名言 ===
+            { id: 11, text: "汝の立つところを深く掘れ。そこには泉がある。", author: "ニーチェ", rarity: "R" },
+            { id: 12, text: "我思う、ゆえに我あり。", author: "デカルト", rarity: "R" },
+            { id: 13, text: "人間は考える葦である。", author: "パスカル", rarity: "R" },
+            { id: 14, text: "困難な道と楽な道があるなら、困難な道を選べ。", author: "エピクテトス", rarity: "R" },
+            { id: 15, text: "仕事とは、自己実現への道である。", author: "ヘーゲル", rarity: "R" },
+            { id: 16, text: "知は力なり。", author: "フランシス・ベーコン", rarity: "R" },
+            { id: 17, text: "万物は流転する。", author: "ヘラクレイトス", rarity: "R" },
+            { id: 18, text: "意志あるところに道は開ける。", author: "ショーペンハウアー", rarity: "R" },
+            { id: 19, text: "自由とは責任を意味する。", author: "サルトル", rarity: "R" },
+            { id: 20, text: "人間は自由の刑に処されている。", author: "サルトル", rarity: "R" },
 
             // === SR: マイナー哲学者 ===
-            { text: "労働は生命の塩である。", author: "ギルバート・ケイス・チェスタトン", rarity: "SR" },
-            { text: "人間の価値は、受け取るものではなく、与えるもので決まる。", author: "アルベルト・アインシュタイン", rarity: "SR" },
-            { text: "できると思えばできる、できないと思えばできない。", author: "パブロ・ピカソ", rarity: "SR" },
-            { text: "世界を変えたければ、まず自分を変えよ。", author: "マハトマ・ガンジー", rarity: "SR" },
-            { text: "希望とは目覚めている夢である。", author: "アリストテレス", rarity: "SR" },
+            { id: 21, text: "実存は本質に先立つ。", author: "サルトル", rarity: "SR" },
+            { id: 22, text: "労働は生命の塩である。", author: "チェスタトン", rarity: "SR" },
+            { id: 23, text: "世界を変えたければ、まず自分を変えよ。", author: "ガンジー", rarity: "SR" },
+            { id: 24, text: "希望とは目覚めている夢である。", author: "アリストテレス", rarity: "SR" },
+            { id: 25, text: "言語の限界が世界の限界である。", author: "ヴィトゲンシュタイン", rarity: "SR" },
 
             // === SSR: 炎上名言 ===
-            { text: "女は男より劣った存在である。", author: "アリストテレス", rarity: "SSR", controversial: true },
-            { text: "奴隷は生きた道具であり、道具は生命なき奴隷である。", author: "アリストテレス", rarity: "SSR", controversial: true },
-            { text: "民衆は愚かであり、強い指導者に従うべきだ。", author: "プラトン", rarity: "SSR", controversial: true },
-            { text: "弱者は滅びよ。そして彼らを助けてやれ。これが人類愛の第一原則だ。", author: "フリードリヒ・ニーチェ", rarity: "SSR", controversial: true },
-            { text: "神は死んだ。そして我々が殺したのだ。", author: "フリードリヒ・ニーチェ", rarity: "SSR", controversial: true },
-            { text: "女は生まれつき欠陥のある男である。", author: "トマス・アクィナス", rarity: "SSR", controversial: true },
-            { text: "怠け者には鞭を与えよ。", author: "マルティン・ルター", rarity: "SSR", controversial: true },
-            { text: "大衆は常に間違っている。", author: "ヘラクレイトス", rarity: "SSR", controversial: true },
-            { text: "人間は狼である。万人は万人に対して敵だ。", author: "トマス・ホッブズ", rarity: "SSR", controversial: true },
-            { text: "理性を持たぬ者は奴隷となるのが自然である。", author: "アリストテレス", rarity: "SSR", controversial: true },
-            { text: "哀れみは弱さの一形態である。", author: "フリードリヒ・ニーチェ", rarity: "SSR", controversial: true },
-            { text: "人生は苦痛であり、存在しない方がましだ。", author: "アルトゥル・ショーペンハウアー", rarity: "SSR", controversial: true },
-            { text: "女には魂がない。", author: "オットー・ヴァイニンガー", rarity: "SSR", controversial: true },
-            { text: "愚者に対しては沈黙で答えよ。", author: "ピタゴラス", rarity: "SSR", controversial: true },
-            { text: "労働者は搾取されて当然だ。それが資本主義だ。", author: "アダム・スミス（誤解釈）", rarity: "SSR", controversial: true },
-            { text: "貧乏人は怠惰だから貧乏なのだ。", author: "ハーバート・スペンサー", rarity: "SSR", controversial: true },
-            { text: "戦争は人間の本性であり、平和は幻想だ。", author: "トマス・ホッブズ", rarity: "SSR", controversial: true },
-            { text: "人間の平等など存在しない。優劣は明らかだ。", author: "フリードリヒ・ニーチェ", rarity: "SSR", controversial: true },
-            { text: "老人は社会のお荷物である。", author: "プラトン（『国家』より）", rarity: "SSR", controversial: true },
-            { text: "同情するな。弱者は淘汰されるべきだ。", author: "ハーバート・スペンサー", rarity: "SSR", controversial: true }
+            { id: 26, text: "女は男より劣った存在である。", author: "アリストテレス", rarity: "SSR", controversial: true },
+            { id: 27, text: "奴隷は生きた道具である。", author: "アリストテレス", rarity: "SSR", controversial: true },
+            { id: 28, text: "民衆は愚かであり、強い指導者に従うべきだ。", author: "プラトン", rarity: "SSR", controversial: true },
+            { id: 29, text: "弱者は滅びよ。これが人類愛の第一原則だ。", author: "ニーチェ", rarity: "SSR", controversial: true },
+            { id: 30, text: "神は死んだ。我々が殺したのだ。", author: "ニーチェ", rarity: "SSR", controversial: true },
+            { id: 31, text: "女は生まれつき欠陥のある男である。", author: "トマス・アクィナス", rarity: "SSR", controversial: true },
+            { id: 32, text: "怠け者には鞭を与えよ。", author: "マルティン・ルター", rarity: "SSR", controversial: true },
+            { id: 33, text: "大衆は常に間違っている。", author: "ヘラクレイトス", rarity: "SSR", controversial: true },
+            { id: 34, text: "人間は狼である。万人の敵だ。", author: "ホッブズ", rarity: "SSR", controversial: true },
+            { id: 35, text: "理性なき者は奴隷となるのが自然だ。", author: "アリストテレス", rarity: "SSR", controversial: true },
+            { id: 36, text: "哀れみは弱さの一形態である。", author: "ニーチェ", rarity: "SSR", controversial: true },
+            { id: 37, text: "人生は苦痛。存在しない方がましだ。", author: "ショーペンハウアー", rarity: "SSR", controversial: true },
+            { id: 38, text: "女には魂がない。", author: "ヴァイニンガー", rarity: "SSR", controversial: true },
+            { id: 39, text: "愚者には沈黙で答えよ。", author: "ピタゴラス", rarity: "SSR", controversial: true },
+            { id: 40, text: "貧乏人は怠惰だから貧乏なのだ。", author: "スペンサー", rarity: "SSR", controversial: true },
+            { id: 41, text: "戦争は人間の本性だ。平和は幻想。", author: "ホッブズ", rarity: "SSR", controversial: true },
+            { id: 42, text: "人間の平等など存在しない。", author: "ニーチェ", rarity: "SSR", controversial: true },
+            { id: 43, text: "老人は社会のお荷物である。", author: "プラトン", rarity: "SSR", controversial: true },
+            { id: 44, text: "同情するな。弱者は淘汰されるべきだ。", author: "スペンサー", rarity: "SSR", controversial: true },
+            { id: 45, text: "結婚とは、憎悪を二人で分かち合うことだ。", author: "ニーチェ", rarity: "SSR", controversial: true }
         ];
 
+        // DOM要素
         const quoteEl = document.getElementById("quote");
         const quoteTextEl = document.getElementById("quote-text");
         const rarityEl = document.getElementById("rarity");
         const buttonEl = document.getElementById("gacha-button");
+        const buttonTenEl = document.getElementById("gacha-ten-button");
+        const shareButtonEl = document.getElementById("share-button");
         const statsEl = document.getElementById("stats");
+        const pityBarFillEl = document.getElementById("pity-bar-fill");
+        const pityTextEl = document.getElementById("pity-text");
+        const multiResultsEl = document.getElementById("multi-results");
+        const collectionToggleEl = document.getElementById("collection-toggle");
+        const collectionEl = document.getElementById("collection");
+        const collectionGridEl = document.getElementById("collection-grid");
+        const progressTextEl = document.getElementById("progress-text");
 
+        // 状態
         let pullCount = 0;
         let ssrCount = 0;
+        let pityCount = 0;
+        let lastQuote = null;
+        let collected = new Set();
+
+        // ローカルストレージから復元
+        function loadState() {
+            try {
+                const saved = localStorage.getItem("philosopherGacha");
+                if (saved) {
+                    const data = JSON.parse(saved);
+                    pullCount = data.pullCount || 0;
+                    ssrCount = data.ssrCount || 0;
+                    pityCount = data.pityCount || 0;
+                    collected = new Set(data.collected || []);
+                }
+            } catch (e) {}
+        }
+
+        function saveState() {
+            try {
+                localStorage.setItem("philosopherGacha", JSON.stringify({
+                    pullCount,
+                    ssrCount,
+                    pityCount,
+                    collected: Array.from(collected)
+                }));
+            } catch (e) {}
+        }
 
         function getRarityClass(rarity) {
             return "rarity-" + rarity.toLowerCase();
         }
 
-        function rollGacha() {
+        function getRandomQuote(forceSSR = false) {
+            if (forceSSR) {
+                const ssrQuotes = quotes.filter(q => q.rarity === "SSR");
+                return ssrQuotes[Math.floor(Math.random() * ssrQuotes.length)];
+            }
+            return quotes[Math.floor(Math.random() * quotes.length)];
+        }
+
+        function updateStats() {
+            statsEl.textContent = "総ガチャ: " + pullCount + " / SSR: " + ssrCount + " / 図鑑: " + collected.size + "/" + quotes.length;
+            pityBarFillEl.style.width = (pityCount / 50 * 100) + "%";
+            pityTextEl.textContent = "天井まで: " + (50 - pityCount) + "回";
+            saveState();
+        }
+
+        function updateCollection() {
+            collectionGridEl.innerHTML = "";
+            quotes.forEach(q => {
+                const item = document.createElement("div");
+                item.className = "collection-item";
+                if (collected.has(q.id)) {
+                    item.classList.add("is-collected");
+                    if (q.rarity === "SSR") {
+                        item.classList.add("is-ssr");
+                    }
+                }
+                item.textContent = q.id;
+                item.title = collected.has(q.id) ? q.text + " — " + q.author : "???";
+                collectionGridEl.appendChild(item);
+            });
+
+            const ssrTotal = quotes.filter(q => q.rarity === "SSR").length;
+            const ssrCollected = quotes.filter(q => q.rarity === "SSR" && collected.has(q.id)).length;
+            progressTextEl.textContent = "SSRコンプリート: " + ssrCollected + "/" + ssrTotal;
+        }
+
+        function displayQuote(quote) {
+            lastQuote = quote;
+            collected.add(quote.id);
+
+            rarityEl.textContent = quote.rarity;
+            rarityEl.className = "rarity is-visible " + getRarityClass(quote.rarity);
+
+            let html = quote.text;
+            html += '<span class="quote-author">— ' + quote.author;
+            if (quote.controversial) {
+                html += '<span class="tag-controversial">炎上</span>';
+            }
+            html += '</span>';
+            quoteTextEl.innerHTML = html;
+
+            if (quote.rarity === "SSR") {
+                document.body.classList.add("is-ssr");
+                ssrCount++;
+                pityCount = 0;
+            } else {
+                document.body.classList.remove("is-ssr");
+                pityCount++;
+            }
+
+            pullCount++;
+            updateStats();
+            updateCollection();
+        }
+
+        function rollSingle() {
             buttonEl.disabled = true;
+            buttonTenEl.disabled = true;
+            multiResultsEl.style.display = "none";
             rarityEl.classList.remove("is-visible");
+            document.body.classList.remove("is-ssr");
             quoteEl.classList.add("is-hidden");
 
-            // ガチャ演出
             quoteTextEl.innerHTML = '<span class="gacha-effect">・・・</span>';
             quoteEl.classList.remove("is-hidden");
 
             let dots = 0;
             const dotAnimation = setInterval(function() {
                 dots = (dots + 1) % 4;
-                const dotText = "・".repeat(dots + 1);
-                quoteTextEl.innerHTML = '<span class="gacha-effect">' + dotText + '</span>';
-            }, 200);
+                quoteTextEl.innerHTML = '<span class="gacha-effect">' + "・".repeat(dots + 1) + '</span>';
+            }, 150);
 
             setTimeout(function() {
                 clearInterval(dotAnimation);
                 quoteEl.classList.add("is-hidden");
 
                 setTimeout(function() {
-                    const randomIndex = Math.floor(Math.random() * quotes.length);
-                    const quote = quotes[randomIndex];
-
-                    // レア度表示
-                    rarityEl.textContent = quote.rarity;
-                    rarityEl.className = "rarity is-visible " + getRarityClass(quote.rarity);
-
-                    // 名言表示
-                    let html = quote.text;
-                    html += '<span class="quote-author">— ' + quote.author;
-                    if (quote.controversial) {
-                        html += '<span class="tag-controversial">炎上</span>';
-                    }
-                    html += '</span>';
-                    quoteTextEl.innerHTML = html;
+                    const forceSSR = pityCount >= 49;
+                    const quote = getRandomQuote(forceSSR);
+                    displayQuote(quote);
                     quoteEl.classList.remove("is-hidden");
-
-                    // 統計更新
-                    pullCount++;
-                    if (quote.rarity === "SSR") {
-                        ssrCount++;
-                    }
-                    statsEl.textContent = "ガチャ回数: " + pullCount + " / SSR: " + ssrCount;
-
                     buttonEl.disabled = false;
+                    buttonTenEl.disabled = false;
                 }, 200);
-            }, 1000);
+            }, 800);
         }
 
-        buttonEl.addEventListener("click", rollGacha);
+        function rollTen() {
+            buttonEl.disabled = true;
+            buttonTenEl.disabled = true;
+            quoteEl.style.display = "none";
+            multiResultsEl.style.display = "block";
+            multiResultsEl.innerHTML = '<span class="gacha-effect">・・・</span>';
+            rarityEl.classList.remove("is-visible");
+            document.body.classList.remove("is-ssr");
 
-        // 初回表示
+            setTimeout(function() {
+                const results = [];
+                let hasSSR = false;
+
+                for (let i = 0; i < 10; i++) {
+                    // 10回目はSSR確定
+                    const forceSSR = (i === 9 && !hasSSR) || pityCount >= 49;
+                    const quote = getRandomQuote(forceSSR);
+
+                    results.push(quote);
+                    collected.add(quote.id);
+
+                    if (quote.rarity === "SSR") {
+                        hasSSR = true;
+                        ssrCount++;
+                        pityCount = 0;
+                    } else {
+                        pityCount++;
+                    }
+                    pullCount++;
+                }
+
+                // 結果表示
+                let html = "";
+                results.forEach((q, i) => {
+                    html += '<div class="multi-result-item">';
+                    html += '<span class="multi-result-rarity ' + getRarityClass(q.rarity) + '">' + q.rarity + '</span>';
+                    html += q.text + ' — ' + q.author;
+                    if (q.controversial) {
+                        html += '<span class="tag-controversial">炎上</span>';
+                    }
+                    html += '</div>';
+                });
+                multiResultsEl.innerHTML = html;
+
+                if (hasSSR) {
+                    document.body.classList.add("is-ssr");
+                    rarityEl.textContent = "SSR!";
+                    rarityEl.className = "rarity is-visible rarity-ssr";
+                }
+
+                lastQuote = results[results.length - 1];
+                updateStats();
+                updateCollection();
+                buttonEl.disabled = false;
+                buttonTenEl.disabled = false;
+            }, 1200);
+        }
+
+        function shareOnX() {
+            if (!lastQuote) return;
+            const text = "【哲学者ガチャ】\n" + lastQuote.rarity + ": 「" + lastQuote.text + "」\n— " + lastQuote.author + "\n\n#哲学者ガチャ #炎上名言";
+            const url = "https://ippeiyasuda-cell.github.io/mumumu/";
+            window.open("https://twitter.com/intent/tweet?text=" + encodeURIComponent(text) + "&url=" + encodeURIComponent(url), "_blank");
+        }
+
+        // イベント
+        buttonEl.addEventListener("click", rollSingle);
+        buttonTenEl.addEventListener("click", rollTen);
+        shareButtonEl.addEventListener("click", shareOnX);
+
+        collectionToggleEl.addEventListener("click", function() {
+            collectionEl.classList.toggle("is-open");
+            collectionToggleEl.textContent = collectionEl.classList.contains("is-open") ? "図鑑を閉じる" : "図鑑を見る";
+        });
+
+        // 初期化
+        loadState();
         quoteTextEl.innerHTML = "ボタンを押してガチャを回そう";
-        statsEl.textContent = "ガチャ回数: 0 / SSR: 0";
+        updateStats();
+        updateCollection();
     </script>
 </body>
 </html>
