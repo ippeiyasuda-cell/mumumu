@@ -2,124 +2,168 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>今日のあなたへ</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>哲学者の名言</title>
     <style>
-        * {
+        *,
+        *::before,
+        *::after {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
+
+        html {
+            font-size: 16px;
+        }
+
         body {
             min-height: 100vh;
             display: flex;
-            flex-direction: column;
             justify-content: center;
             align-items: center;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            font-family: 'Segoe UI', 'Yu Gothic', sans-serif;
-            padding: 20px;
-        }
-        .container {
-            text-align: center;
-            background: rgba(255, 255, 255, 0.95);
-            padding: 50px 40px;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            max-width: 500px;
-        }
-        h1 {
-            color: #764ba2;
-            margin-bottom: 30px;
-            font-size: 1.8em;
-        }
-        .message {
-            font-size: 1.5em;
+            background-color: #fafafa;
+            font-family: "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Yu Gothic", "Meiryo", sans-serif;
             color: #333;
             line-height: 1.8;
-            min-height: 120px;
+            padding: 1.5rem;
+        }
+
+        .card {
+            width: 100%;
+            max-width: 32rem;
+            background-color: #fff;
+            border: 1px solid #e0e0e0;
+            padding: 3rem 2rem;
+        }
+
+        .card-title {
+            font-size: 0.875rem;
+            font-weight: normal;
+            color: #757575;
+            margin-bottom: 2rem;
+            letter-spacing: 0.1em;
+        }
+
+        .quote {
+            font-size: 1.125rem;
+            min-height: 8rem;
             display: flex;
             align-items: center;
-            justify-content: center;
-            padding: 20px;
+            margin-bottom: 2.5rem;
+            transition: opacity 0.2s ease;
         }
-        button {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+
+        .quote.is-hidden {
+            opacity: 0;
+        }
+
+        .quote-text {
+            display: block;
+        }
+
+        .quote-author {
+            display: block;
+            margin-top: 1rem;
+            font-size: 0.875rem;
+            color: #757575;
+        }
+
+        .button {
+            display: block;
+            width: 100%;
+            padding: 1rem;
+            font-size: 1rem;
+            font-family: inherit;
+            color: #fff;
+            background-color: #333;
             border: none;
-            padding: 15px 40px;
-            font-size: 1.2em;
-            border-radius: 50px;
             cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-            margin-top: 20px;
+            transition: background-color 0.2s ease;
         }
-        button:hover {
-            transform: scale(1.05);
-            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+
+        .button:hover {
+            background-color: #555;
         }
-        .sparkle {
-            font-size: 2em;
-            margin-bottom: 20px;
+
+        .button:focus {
+            outline: 2px solid #333;
+            outline-offset: 2px;
+        }
+
+        @media (max-width: 480px) {
+            .card {
+                padding: 2rem 1.5rem;
+            }
+
+            .quote {
+                font-size: 1rem;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="sparkle">✨</div>
-        <h1>哲学者の名言</h1>
-        <div class="message" id="message">ボタンを押してね！</div>
-        <button onclick="showMessage()">メッセージをもらう</button>
-    </div>
+    <main class="card">
+        <h1 class="card-title">哲学者の名言</h1>
+        <blockquote class="quote" id="quote">
+            <span class="quote-text" id="quote-text"></span>
+        </blockquote>
+        <button type="button" class="button" id="next-button">次の名言</button>
+    </main>
 
     <script>
-        const messages = [
-            "働くことは生きること。生きることは働くことだ。\n— カール・マルクス",
-            "天才とは1%のひらめきと99%の努力である。\n— トーマス・エジソン（哲学的発明家）",
-            "最も重要なことは、自分の仕事を愛することだ。\n— 孔子",
-            "汝の立つところを深く掘れ。そこには泉がある。\n— フリードリヒ・ニーチェ",
-            "小さなことを重ねることが、とんでもないところに行くただ一つの道だ。\n— アリストテレス",
-            "人生において最も輝かしい時は、成功した時ではなく、失敗や絶望から立ち上がる時だ。\n— ソクラテス",
-            "始めることが難しい。だが、始めなければ何も生まれない。\n— プラトン",
-            "我思う、ゆえに我あり。思考こそが仕事の本質だ。\n— ルネ・デカルト",
-            "怠惰は心の錆である。\n— セネカ",
-            "今日なし得ることを明日に延ばすな。\n— ベンジャミン・フランクリン",
-            "人間は考える葦である。考えることが我々の仕事だ。\n— ブレーズ・パスカル",
-            "困難な道と楽な道があるなら、困難な道を選べ。\n— エピクテトス",
-            "仕事とは、自己実現への道である。\n— ゲオルク・ヘーゲル",
-            "急いで結果を求めるな。偉大なことは時間がかかる。\n— アリストテレス",
-            "知は力なり。学び続けることが最高の仕事だ。\n— フランシス・ベーコン",
-            "他人の意見に振り回されるな。自分の仕事に集中せよ。\n— マルクス・アウレリウス",
-            "失敗を恐れるな。失敗は成功の母である。\n— ジョン・デューイ",
-            "人は習慣によって作られる。優れた結果は一時的な行動ではなく、習慣から生まれる。\n— アリストテレス",
-            "簡素に生きよ。そして高く考えよ。\n— ソクラテス",
-            "人生は短い。だからこそ、自分の仕事に情熱を注げ。\n— セネカ",
-            "万物は流転する。変化を恐れず、前に進め。\n— ヘラクレイトス",
-            "無知の知。自分の限界を知ることが成長の始まりだ。\n— ソクラテス",
-            "意志あるところに道は開ける。\n— アルトゥル・ショーペンハウアー",
-            "最大多数の最大幸福のために働け。\n— ジェレミー・ベンサム",
-            "自由とは責任を意味する。だから多くの人が自由を恐れる。\n— ジャン＝ポール・サルトル",
-            "実存は本質に先立つ。自分の仕事で自分を創れ。\n— ジャン＝ポール・サルトル",
-            "中庸こそ最善。極端を避け、バランスを保て。\n— アリストテレス",
-            "人間は自由の刑に処されている。だからこそ、全力で働くのだ。\n— ジャン＝ポール・サルトル",
-            "幸福は活動の中にある。何もしない者に幸福はない。\n— アリストテレス",
-            "今日が人生最後の日だと思って働け。いつかその日が来る。\n— マルクス・アウレリウス"
+        const quotes = [
+            { text: "働くことは生きること。生きることは働くことだ。", author: "カール・マルクス" },
+            { text: "天才とは1%のひらめきと99%の努力である。", author: "トーマス・エジソン" },
+            { text: "最も重要なことは、自分の仕事を愛することだ。", author: "孔子" },
+            { text: "汝の立つところを深く掘れ。そこには泉がある。", author: "フリードリヒ・ニーチェ" },
+            { text: "小さなことを重ねることが、とんでもないところに行くただ一つの道だ。", author: "アリストテレス" },
+            { text: "人生において最も輝かしい時は、成功した時ではなく、失敗や絶望から立ち上がる時だ。", author: "ソクラテス" },
+            { text: "始めることが難しい。だが、始めなければ何も生まれない。", author: "プラトン" },
+            { text: "我思う、ゆえに我あり。思考こそが仕事の本質だ。", author: "ルネ・デカルト" },
+            { text: "怠惰は心の錆である。", author: "セネカ" },
+            { text: "今日なし得ることを明日に延ばすな。", author: "ベンジャミン・フランクリン" },
+            { text: "人間は考える葦である。考えることが我々の仕事だ。", author: "ブレーズ・パスカル" },
+            { text: "困難な道と楽な道があるなら、困難な道を選べ。", author: "エピクテトス" },
+            { text: "仕事とは、自己実現への道である。", author: "ゲオルク・ヘーゲル" },
+            { text: "急いで結果を求めるな。偉大なことは時間がかかる。", author: "アリストテレス" },
+            { text: "知は力なり。学び続けることが最高の仕事だ。", author: "フランシス・ベーコン" },
+            { text: "他人の意見に振り回されるな。自分の仕事に集中せよ。", author: "マルクス・アウレリウス" },
+            { text: "失敗を恐れるな。失敗は成功の母である。", author: "ジョン・デューイ" },
+            { text: "人は習慣によって作られる。優れた結果は一時的な行動ではなく、習慣から生まれる。", author: "アリストテレス" },
+            { text: "簡素に生きよ。そして高く考えよ。", author: "ソクラテス" },
+            { text: "人生は短い。だからこそ、自分の仕事に情熱を注げ。", author: "セネカ" },
+            { text: "万物は流転する。変化を恐れず、前に進め。", author: "ヘラクレイトス" },
+            { text: "無知の知。自分の限界を知ることが成長の始まりだ。", author: "ソクラテス" },
+            { text: "意志あるところに道は開ける。", author: "アルトゥル・ショーペンハウアー" },
+            { text: "最大多数の最大幸福のために働け。", author: "ジェレミー・ベンサム" },
+            { text: "自由とは責任を意味する。だから多くの人が自由を恐れる。", author: "ジャン＝ポール・サルトル" },
+            { text: "実存は本質に先立つ。自分の仕事で自分を創れ。", author: "ジャン＝ポール・サルトル" },
+            { text: "中庸こそ最善。極端を避け、バランスを保て。", author: "アリストテレス" },
+            { text: "人間は自由の刑に処されている。だからこそ、全力で働くのだ。", author: "ジャン＝ポール・サルトル" },
+            { text: "幸福は活動の中にある。何もしない者に幸福はない。", author: "アリストテレス" },
+            { text: "今日が人生最後の日だと思って働け。いつかその日が来る。", author: "マルクス・アウレリウス" }
         ];
 
-        function showMessage() {
-            const randomIndex = Math.floor(Math.random() * messages.length);
-            const messageEl = document.getElementById('message');
-            messageEl.style.opacity = '0';
+        const quoteEl = document.getElementById("quote");
+        const quoteTextEl = document.getElementById("quote-text");
+        const buttonEl = document.getElementById("next-button");
 
-            setTimeout(() => {
-                messageEl.innerHTML = messages[randomIndex].replace(/\n/g, '<br>');
-                messageEl.style.opacity = '1';
+        function showQuote() {
+            const randomIndex = Math.floor(Math.random() * quotes.length);
+            const quote = quotes[randomIndex];
+
+            quoteEl.classList.add("is-hidden");
+
+            setTimeout(function() {
+                quoteTextEl.innerHTML = quote.text + '<span class="quote-author">— ' + quote.author + '</span>';
+                quoteEl.classList.remove("is-hidden");
             }, 200);
         }
 
-        // ページ読み込み時にもランダムメッセージを表示
-        window.onload = function() {
-            showMessage();
-        };
+        buttonEl.addEventListener("click", showQuote);
+
+        showQuote();
     </script>
 </body>
 </html>
