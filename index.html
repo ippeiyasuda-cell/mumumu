@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>哲学者の名言</title>
+    <title>哲学者ガチャ</title>
     <style>
         *,
         *::before,
@@ -37,17 +37,40 @@
             padding: 3rem 2rem;
         }
 
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
         .card-title {
             font-size: 0.875rem;
             font-weight: normal;
             color: #757575;
-            margin-bottom: 2rem;
             letter-spacing: 0.1em;
         }
 
+        .rarity {
+            font-size: 0.875rem;
+            font-weight: bold;
+            letter-spacing: 0.05em;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .rarity.is-visible {
+            opacity: 1;
+        }
+
+        .rarity-n { color: #757575; }
+        .rarity-r { color: #2196F3; }
+        .rarity-sr { color: #9C27B0; }
+        .rarity-ssr { color: #F44336; }
+
         .quote {
             font-size: 1.125rem;
-            min-height: 8rem;
+            min-height: 10rem;
             display: flex;
             align-items: center;
             margin-bottom: 2.5rem;
@@ -66,6 +89,23 @@
             display: block;
             margin-top: 1rem;
             font-size: 0.875rem;
+            color: #757575;
+        }
+
+        .tag-controversial {
+            display: inline-block;
+            font-size: 0.625rem;
+            color: #F44336;
+            border: 1px solid #F44336;
+            padding: 0.125rem 0.375rem;
+            margin-left: 0.5rem;
+            vertical-align: middle;
+        }
+
+        .gacha-effect {
+            font-size: 1.5rem;
+            text-align: center;
+            letter-spacing: 0.5em;
             color: #757575;
         }
 
@@ -91,6 +131,18 @@
             outline-offset: 2px;
         }
 
+        .button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .stats {
+            margin-top: 1.5rem;
+            font-size: 0.75rem;
+            color: #757575;
+            text-align: center;
+        }
+
         @media (max-width: 480px) {
             .card {
                 padding: 2rem 1.5rem;
@@ -104,66 +156,149 @@
 </head>
 <body>
     <main class="card">
-        <h1 class="card-title">哲学者の名言</h1>
+        <div class="card-header">
+            <h1 class="card-title">哲学者ガチャ</h1>
+            <span class="rarity" id="rarity"></span>
+        </div>
         <blockquote class="quote" id="quote">
             <span class="quote-text" id="quote-text"></span>
         </blockquote>
-        <button type="button" class="button" id="next-button">次の名言</button>
+        <button type="button" class="button" id="gacha-button">ガチャを回す</button>
+        <p class="stats" id="stats"></p>
     </main>
 
     <script>
         const quotes = [
-            { text: "働くことは生きること。生きることは働くことだ。", author: "カール・マルクス" },
-            { text: "天才とは1%のひらめきと99%の努力である。", author: "トーマス・エジソン" },
-            { text: "最も重要なことは、自分の仕事を愛することだ。", author: "孔子" },
-            { text: "汝の立つところを深く掘れ。そこには泉がある。", author: "フリードリヒ・ニーチェ" },
-            { text: "小さなことを重ねることが、とんでもないところに行くただ一つの道だ。", author: "アリストテレス" },
-            { text: "人生において最も輝かしい時は、成功した時ではなく、失敗や絶望から立ち上がる時だ。", author: "ソクラテス" },
-            { text: "始めることが難しい。だが、始めなければ何も生まれない。", author: "プラトン" },
-            { text: "我思う、ゆえに我あり。思考こそが仕事の本質だ。", author: "ルネ・デカルト" },
-            { text: "怠惰は心の錆である。", author: "セネカ" },
-            { text: "今日なし得ることを明日に延ばすな。", author: "ベンジャミン・フランクリン" },
-            { text: "人間は考える葦である。考えることが我々の仕事だ。", author: "ブレーズ・パスカル" },
-            { text: "困難な道と楽な道があるなら、困難な道を選べ。", author: "エピクテトス" },
-            { text: "仕事とは、自己実現への道である。", author: "ゲオルク・ヘーゲル" },
-            { text: "急いで結果を求めるな。偉大なことは時間がかかる。", author: "アリストテレス" },
-            { text: "知は力なり。学び続けることが最高の仕事だ。", author: "フランシス・ベーコン" },
-            { text: "他人の意見に振り回されるな。自分の仕事に集中せよ。", author: "マルクス・アウレリウス" },
-            { text: "失敗を恐れるな。失敗は成功の母である。", author: "ジョン・デューイ" },
-            { text: "人は習慣によって作られる。優れた結果は一時的な行動ではなく、習慣から生まれる。", author: "アリストテレス" },
-            { text: "簡素に生きよ。そして高く考えよ。", author: "ソクラテス" },
-            { text: "人生は短い。だからこそ、自分の仕事に情熱を注げ。", author: "セネカ" },
-            { text: "万物は流転する。変化を恐れず、前に進め。", author: "ヘラクレイトス" },
-            { text: "無知の知。自分の限界を知ることが成長の始まりだ。", author: "ソクラテス" },
-            { text: "意志あるところに道は開ける。", author: "アルトゥル・ショーペンハウアー" },
-            { text: "最大多数の最大幸福のために働け。", author: "ジェレミー・ベンサム" },
-            { text: "自由とは責任を意味する。だから多くの人が自由を恐れる。", author: "ジャン＝ポール・サルトル" },
-            { text: "実存は本質に先立つ。自分の仕事で自分を創れ。", author: "ジャン＝ポール・サルトル" },
-            { text: "中庸こそ最善。極端を避け、バランスを保て。", author: "アリストテレス" },
-            { text: "人間は自由の刑に処されている。だからこそ、全力で働くのだ。", author: "ジャン＝ポール・サルトル" },
-            { text: "幸福は活動の中にある。何もしない者に幸福はない。", author: "アリストテレス" },
-            { text: "今日が人生最後の日だと思って働け。いつかその日が来る。", author: "マルクス・アウレリウス" }
+            // === 通常名言 (N/R) ===
+            { text: "働くことは生きること。生きることは働くことだ。", author: "カール・マルクス", rarity: "N" },
+            { text: "天才とは1%のひらめきと99%の努力である。", author: "トーマス・エジソン", rarity: "N" },
+            { text: "最も重要なことは、自分の仕事を愛することだ。", author: "孔子", rarity: "N" },
+            { text: "汝の立つところを深く掘れ。そこには泉がある。", author: "フリードリヒ・ニーチェ", rarity: "R" },
+            { text: "小さなことを重ねることが、とんでもないところに行くただ一つの道だ。", author: "アリストテレス", rarity: "N" },
+            { text: "人生において最も輝かしい時は、失敗や絶望から立ち上がる時だ。", author: "ソクラテス", rarity: "N" },
+            { text: "始めることが難しい。だが、始めなければ何も生まれない。", author: "プラトン", rarity: "N" },
+            { text: "我思う、ゆえに我あり。思考こそが仕事の本質だ。", author: "ルネ・デカルト", rarity: "R" },
+            { text: "怠惰は心の錆である。", author: "セネカ", rarity: "N" },
+            { text: "今日なし得ることを明日に延ばすな。", author: "ベンジャミン・フランクリン", rarity: "N" },
+            { text: "人間は考える葦である。考えることが我々の仕事だ。", author: "ブレーズ・パスカル", rarity: "R" },
+            { text: "困難な道と楽な道があるなら、困難な道を選べ。", author: "エピクテトス", rarity: "R" },
+            { text: "仕事とは、自己実現への道である。", author: "ゲオルク・ヘーゲル", rarity: "R" },
+            { text: "急いで結果を求めるな。偉大なことは時間がかかる。", author: "アリストテレス", rarity: "N" },
+            { text: "知は力なり。学び続けることが最高の仕事だ。", author: "フランシス・ベーコン", rarity: "R" },
+            { text: "他人の意見に振り回されるな。自分の仕事に集中せよ。", author: "マルクス・アウレリウス", rarity: "R" },
+            { text: "失敗を恐れるな。失敗は成功の母である。", author: "ジョン・デューイ", rarity: "N" },
+            { text: "人は習慣によって作られる。優れた結果は習慣から生まれる。", author: "アリストテレス", rarity: "N" },
+            { text: "簡素に生きよ。そして高く考えよ。", author: "ソクラテス", rarity: "N" },
+            { text: "人生は短い。だからこそ、自分の仕事に情熱を注げ。", author: "セネカ", rarity: "N" },
+            { text: "万物は流転する。変化を恐れず、前に進め。", author: "ヘラクレイトス", rarity: "R" },
+            { text: "無知の知。自分の限界を知ることが成長の始まりだ。", author: "ソクラテス", rarity: "N" },
+            { text: "意志あるところに道は開ける。", author: "アルトゥル・ショーペンハウアー", rarity: "R" },
+            { text: "最大多数の最大幸福のために働け。", author: "ジェレミー・ベンサム", rarity: "R" },
+            { text: "自由とは責任を意味する。だから多くの人が自由を恐れる。", author: "ジャン＝ポール・サルトル", rarity: "R" },
+            { text: "実存は本質に先立つ。自分の仕事で自分を創れ。", author: "ジャン＝ポール・サルトル", rarity: "SR" },
+            { text: "中庸こそ最善。極端を避け、バランスを保て。", author: "アリストテレス", rarity: "N" },
+            { text: "人間は自由の刑に処されている。", author: "ジャン＝ポール・サルトル", rarity: "R" },
+            { text: "幸福は活動の中にある。何もしない者に幸福はない。", author: "アリストテレス", rarity: "N" },
+            { text: "今日が人生最後の日だと思って働け。", author: "マルクス・アウレリウス", rarity: "R" },
+
+            // === SR: マイナー哲学者 ===
+            { text: "労働は生命の塩である。", author: "ギルバート・ケイス・チェスタトン", rarity: "SR" },
+            { text: "人間の価値は、受け取るものではなく、与えるもので決まる。", author: "アルベルト・アインシュタイン", rarity: "SR" },
+            { text: "できると思えばできる、できないと思えばできない。", author: "パブロ・ピカソ", rarity: "SR" },
+            { text: "世界を変えたければ、まず自分を変えよ。", author: "マハトマ・ガンジー", rarity: "SR" },
+            { text: "希望とは目覚めている夢である。", author: "アリストテレス", rarity: "SR" },
+
+            // === SSR: 炎上名言 ===
+            { text: "女は男より劣った存在である。", author: "アリストテレス", rarity: "SSR", controversial: true },
+            { text: "奴隷は生きた道具であり、道具は生命なき奴隷である。", author: "アリストテレス", rarity: "SSR", controversial: true },
+            { text: "民衆は愚かであり、強い指導者に従うべきだ。", author: "プラトン", rarity: "SSR", controversial: true },
+            { text: "弱者は滅びよ。そして彼らを助けてやれ。これが人類愛の第一原則だ。", author: "フリードリヒ・ニーチェ", rarity: "SSR", controversial: true },
+            { text: "神は死んだ。そして我々が殺したのだ。", author: "フリードリヒ・ニーチェ", rarity: "SSR", controversial: true },
+            { text: "女は生まれつき欠陥のある男である。", author: "トマス・アクィナス", rarity: "SSR", controversial: true },
+            { text: "怠け者には鞭を与えよ。", author: "マルティン・ルター", rarity: "SSR", controversial: true },
+            { text: "大衆は常に間違っている。", author: "ヘラクレイトス", rarity: "SSR", controversial: true },
+            { text: "人間は狼である。万人は万人に対して敵だ。", author: "トマス・ホッブズ", rarity: "SSR", controversial: true },
+            { text: "理性を持たぬ者は奴隷となるのが自然である。", author: "アリストテレス", rarity: "SSR", controversial: true },
+            { text: "哀れみは弱さの一形態である。", author: "フリードリヒ・ニーチェ", rarity: "SSR", controversial: true },
+            { text: "人生は苦痛であり、存在しない方がましだ。", author: "アルトゥル・ショーペンハウアー", rarity: "SSR", controversial: true },
+            { text: "女には魂がない。", author: "オットー・ヴァイニンガー", rarity: "SSR", controversial: true },
+            { text: "愚者に対しては沈黙で答えよ。", author: "ピタゴラス", rarity: "SSR", controversial: true },
+            { text: "労働者は搾取されて当然だ。それが資本主義だ。", author: "アダム・スミス（誤解釈）", rarity: "SSR", controversial: true },
+            { text: "貧乏人は怠惰だから貧乏なのだ。", author: "ハーバート・スペンサー", rarity: "SSR", controversial: true },
+            { text: "戦争は人間の本性であり、平和は幻想だ。", author: "トマス・ホッブズ", rarity: "SSR", controversial: true },
+            { text: "人間の平等など存在しない。優劣は明らかだ。", author: "フリードリヒ・ニーチェ", rarity: "SSR", controversial: true },
+            { text: "老人は社会のお荷物である。", author: "プラトン（『国家』より）", rarity: "SSR", controversial: true },
+            { text: "同情するな。弱者は淘汰されるべきだ。", author: "ハーバート・スペンサー", rarity: "SSR", controversial: true }
         ];
 
         const quoteEl = document.getElementById("quote");
         const quoteTextEl = document.getElementById("quote-text");
-        const buttonEl = document.getElementById("next-button");
+        const rarityEl = document.getElementById("rarity");
+        const buttonEl = document.getElementById("gacha-button");
+        const statsEl = document.getElementById("stats");
 
-        function showQuote() {
-            const randomIndex = Math.floor(Math.random() * quotes.length);
-            const quote = quotes[randomIndex];
+        let pullCount = 0;
+        let ssrCount = 0;
 
-            quoteEl.classList.add("is-hidden");
-
-            setTimeout(function() {
-                quoteTextEl.innerHTML = quote.text + '<span class="quote-author">— ' + quote.author + '</span>';
-                quoteEl.classList.remove("is-hidden");
-            }, 200);
+        function getRarityClass(rarity) {
+            return "rarity-" + rarity.toLowerCase();
         }
 
-        buttonEl.addEventListener("click", showQuote);
+        function rollGacha() {
+            buttonEl.disabled = true;
+            rarityEl.classList.remove("is-visible");
+            quoteEl.classList.add("is-hidden");
 
-        showQuote();
+            // ガチャ演出
+            quoteTextEl.innerHTML = '<span class="gacha-effect">・・・</span>';
+            quoteEl.classList.remove("is-hidden");
+
+            let dots = 0;
+            const dotAnimation = setInterval(function() {
+                dots = (dots + 1) % 4;
+                const dotText = "・".repeat(dots + 1);
+                quoteTextEl.innerHTML = '<span class="gacha-effect">' + dotText + '</span>';
+            }, 200);
+
+            setTimeout(function() {
+                clearInterval(dotAnimation);
+                quoteEl.classList.add("is-hidden");
+
+                setTimeout(function() {
+                    const randomIndex = Math.floor(Math.random() * quotes.length);
+                    const quote = quotes[randomIndex];
+
+                    // レア度表示
+                    rarityEl.textContent = quote.rarity;
+                    rarityEl.className = "rarity is-visible " + getRarityClass(quote.rarity);
+
+                    // 名言表示
+                    let html = quote.text;
+                    html += '<span class="quote-author">— ' + quote.author;
+                    if (quote.controversial) {
+                        html += '<span class="tag-controversial">炎上</span>';
+                    }
+                    html += '</span>';
+                    quoteTextEl.innerHTML = html;
+                    quoteEl.classList.remove("is-hidden");
+
+                    // 統計更新
+                    pullCount++;
+                    if (quote.rarity === "SSR") {
+                        ssrCount++;
+                    }
+                    statsEl.textContent = "ガチャ回数: " + pullCount + " / SSR: " + ssrCount;
+
+                    buttonEl.disabled = false;
+                }, 200);
+            }, 1000);
+        }
+
+        buttonEl.addEventListener("click", rollGacha);
+
+        // 初回表示
+        quoteTextEl.innerHTML = "ボタンを押してガチャを回そう";
+        statsEl.textContent = "ガチャ回数: 0 / SSR: 0";
     </script>
 </body>
 </html>
